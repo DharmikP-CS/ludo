@@ -1,4 +1,6 @@
+import { cloneDeep } from "lodash";
 import { useState } from "react";
+import Dice from "./Dice/Dice";
 
 const isInBox = (box, point) => {
   const { topLeft, bottomRight } = box;
@@ -131,6 +133,7 @@ export default function MyApp() {
     { x: 2, y: 8 },
   ];
   const [idOfPlayerWhoseTurnItIs, setIdOfPlayerWhoseTurnItIs] = useState(1);
+  const [roll, setRoll] = useState(1);
 
   const compIsSafe = (x, y) =>
     !!safeCells.find((safeCell) => safeCell.x === x && safeCell.y === y);
@@ -152,6 +155,30 @@ export default function MyApp() {
   const getRow = (y) => {
     const cells = [];
     for (let x = 0; x < 15; x++) {
+      if (y === 7 && x === 7) {
+        cells.push(
+          <td
+            style={{
+              width: cellSize,
+              height: cellSize,
+              // border: "solid black",
+              // display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            key={x + "," + y}
+          >
+            <Dice
+              onClick={takeTurn}
+              roll={roll}
+              player={players.find(
+                (player) => player.id === idOfPlayerWhoseTurnItIs
+              )}
+            />
+          </td>
+        );
+        continue;
+      }
       const isSafe = compIsSafe(x, y);
       const homeOfPlayer = compHomeOfPlayer(x, y);
       const homePathOfPlayer = compHomePathOfPlayer(x, y);
@@ -194,6 +221,53 @@ export default function MyApp() {
       rows.push(<tr key={y}>{getRow(y)}</tr>);
     }
     return rows;
+  };
+
+  const assignTurnToNext = () =>
+    setIdOfPlayerWhoseTurnItIs(
+      (idOfPlayerWhoseTurnItIs2) => ((idOfPlayerWhoseTurnItIs2 + 1) % 4) + 1
+    );
+
+  const rollDice = () => {
+    const array = new Uint32Array(1);
+    self.crypto.getRandomValues(array);
+    return (array[0] % 6) + 1;
+  };
+  const takeTurn = () => {
+    const roll = rollDice();
+    setRoll(roll);
+    const player = players.find(
+      (player) => player.id === idOfPlayerWhoseTurnItIs
+    );
+    const pieces = player.pieces;
+    const areAllPiecesInStartArea = pieces.every((piece) =>
+      isInBox(player.startArea, piece)
+    );
+    if (areAllPiecesInStartArea) {
+      if (roll !== 6) {
+        assignTurnToNext();
+        return;
+      } else {
+        const firstAvlblPieceInStartArea = pieces.find((piece) =>
+          isInBox(player.startArea, piece)
+        );
+        setPlayers((currentPlayers) => {
+          const players = cloneDeep(currentPlayers);
+          const player = players.find(
+            (player) => player.id === idOfPlayerWhoseTurnItIs
+          );
+          const piece = player.pieces.find(
+            (piece) => piece.id === firstAvlblPieceInStartArea.id
+          );
+          piece.x = player.start.x;
+          piece.y = player.start.y;
+          return players;
+        });
+        assignTurnToNext();
+        return;
+      }
+    }
+    assignTurnToNext();
   };
   return (
     <div>
