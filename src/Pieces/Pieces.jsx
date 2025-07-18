@@ -1,4 +1,3 @@
-import { css, keyframes } from "styled-components";
 export default function Pieces({
   canThisPieceMove,
   toSelectPiece,
