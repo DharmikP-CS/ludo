@@ -1,2 +1,0 @@
-# ludo
-Created with CodeSandbox
