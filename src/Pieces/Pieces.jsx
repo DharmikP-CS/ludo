@@ -25,8 +25,9 @@ export default function Pieces({
   const svgT = (
     <svg
       version="1.1"
-      width={pieceSize}
-      height={pieceSize}
+      width="100%"
+      height="100%"
+      style={{ display: "block", padding: 0 }}
       xmlns="http://www.w3.org/2000/svg"
       onClick={() => selectPiece()}
     >
@@ -37,8 +38,8 @@ export default function Pieces({
         </radialGradient>
       </defs>
       <circle
-        cx={halfPieceSize}
-        cy={halfPieceSize}
+        cx="50%"
+        cy="50%"
         r={radius}
         fill={`url(#myGradient${player.color})`}
         stroke={"black"}
@@ -57,8 +58,8 @@ export default function Pieces({
       ></animate>
       {player.pieces.length > 1 && (
         <text
-          x={halfPieceSize}
-          y={halfPieceSize}
+          x="50%"
+          y="50%"
           fontSize={`calc(${halfPieceSize})`}
           fontFamily="Courier New"
           textAnchor="middle"

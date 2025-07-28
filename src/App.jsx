@@ -1,4 +1,4 @@
-import { cloneDeep, inRange, isNil } from "lodash";
+import { cloneDeep, inRange } from "lodash";
 import { useState } from "react";
 import Dice from "./Dice/Dice";
 import Pieces from "./Pieces/Pieces";
@@ -29,7 +29,7 @@ const isEdgeOfBox = (box, point) => {
   );
 };
 
-const cellSize = "2.5rem";
+const cellSize = "min(6vw, 6vh)";
 
 export default function MyApp() {
   const playerPieceStartMapping = {
@@ -416,6 +416,7 @@ export default function MyApp() {
         : Math.abs(piece.x - home.x);
     return distToHome >= newRoll;
   };
+
   const getPiecesAvailableToMove = (player, newRoll) =>
     player.pieces.filter((piece) => canThisPieceMove(player, piece, newRoll));
 
@@ -482,10 +483,7 @@ export default function MyApp() {
             style={{
               width: cellSize,
               height: cellSize,
-              // border: "solid black",
-              // display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              backgroundColor: "black",
               padding: 0,
             }}
             key={x + "," + y}
@@ -493,6 +491,7 @@ export default function MyApp() {
             <Dice
               onClick={takeTurn}
               roll={roll}
+              toSelectPiece={toSelectPiece}
               player={players.find(
                 (player) => player.id === idOfPlayerWhoseTurnItIs
               )}
@@ -522,8 +521,10 @@ export default function MyApp() {
         ...(styleForHomeNeighbour && { background: styleForHomeNeighbour }),
         width: cellSize,
         height: cellSize,
-        border: "solid black",
-        textAlign: "center",
+        border: "solid black 1px",
+        display: "grid",
+        placeItems: "center",
+        padding: 0,
       };
       cells.push(
         <td style={style} key={x + "," + y}>
@@ -534,7 +535,11 @@ export default function MyApp() {
                     player={player}
                     toSelectPiece={toSelectPiece}
                     canThisPieceMove={canThisPieceMove}
-                    pieceSize={`calc(${cellSize}/${playersWithPiecesInThisCell.length})`}
+                    pieceSize={
+                      playersWithPiecesInThisCell.length === 1
+                        ? cellSize
+                        : `calc(${cellSize}/${playersWithPiecesInThisCell.length})`
+                    }
                     roll={roll}
                     key={x + "," + y}
                     setToSelectPiece={setToSelectPiece}
@@ -552,7 +557,11 @@ export default function MyApp() {
   const getRows = () => {
     const rows = [];
     for (let y = 0; y < 15; y++) {
-      rows.push(<tr key={y}>{getRow(y)}</tr>);
+      rows.push(
+        <tr style={{ display: "flex" }} key={y}>
+          {getRow(y)}
+        </tr>
+      );
     }
     return rows;
   };
@@ -598,8 +607,14 @@ export default function MyApp() {
     }
   };
   return (
-    <div>
-      <table style={{ borderCollapse: "collapse" }}>
+    <div
+      style={{
+        display: "grid",
+        placeItems: "center",
+        padding: 0,
+      }}
+    >
+      <table style={{ borderCollapse: "collapse", border: "solid black 2px" }}>
         <tbody>{getRows()}</tbody>
       </table>
     </div>
