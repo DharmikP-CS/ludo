@@ -1,3 +1,5 @@
+git checkout main
+git checkout pull
 git checkout site
 git rebase origin/main
 pnpm run build
