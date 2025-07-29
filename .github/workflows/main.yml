@@ -39,4 +39,4 @@ jobs:
         run: |
           git add .
           git commit -m "Generated build"
-          git push
+          git push --force-with-leash
