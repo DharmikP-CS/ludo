@@ -8,5 +8,32 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-    - run: |
-        echo The PR was merged
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+      - name: Checkout default
+        uses: actions/checkout@v4
+      - name: Checkout site branch
+        uses: actions/checkout@v4
+        with: 
+          ref: 'site'
+      - name: Setup Git
+        run: |
+           git --version
+           git config user.name "GitHub Actions Bot"
+           git config user.email "<>"
+           git status
+      - name: Rebase site onto main
+        run: git rebase origin/main
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 10.13.1
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run publish script
+        run: pnpm run publish
+      - name: Commit and push
+        run: |
+          git add .
+          git commit -m "Generated build"
+          git push
